@@ -4,12 +4,9 @@
     {
         public ShipModel ShipModel { get; set; }
 
-        public bool IsEmpty => ShipModel != null;
+        public bool IsNotEmpty => ShipModel != null;
 
-        public FieldModel()
-        {
-
-        }
+        public bool WasHit { get; set; }
 
         public FieldModel(ShipModel shipModel)
         {

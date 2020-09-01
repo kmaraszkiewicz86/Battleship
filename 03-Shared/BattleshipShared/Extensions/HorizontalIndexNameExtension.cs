@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BattleshipShared.Exceptions;
+﻿using BattleshipShared.Exceptions;
 
 namespace BattleshipShared.Extensions
 {

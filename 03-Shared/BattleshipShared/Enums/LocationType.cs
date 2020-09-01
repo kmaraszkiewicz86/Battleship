@@ -3,8 +3,8 @@
     public enum LocationType
     {
         None = 0,
-        HorizontalLeft = 1,
-        HorizontalRight = 2,
+        HorizontalToLeft = 1,
+        HorizontalToRight = 2,
         VerticalToTop = 3,
         VerticalToBottom = 4
     }

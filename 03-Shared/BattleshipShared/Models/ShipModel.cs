@@ -1,86 +1,63 @@
 ﻿using System.Collections.Generic;
-using BattleshipShared.Enums;
-using BattleshipShared.Extensions;
+using System.Text;
 
 namespace BattleshipShared.Models
 {
     public class ShipModel
     {
-        public int Size => _locationPositions.Count;
+        public bool IsDestroyed => CurrentSquaresSize == 0;
 
-        public List<string> LocationPositions => _locationPositions;
+        public int SquaresSize => _size;
+
+        public int CurrentSquaresSize { get; private set; }
+
+        public List<string> LocationPositions { get; }
+
+        public string Name
+        {
+            get
+            {
+                return _size == 5 ? "Battleship" : "Destroyer";
+            }
+        }
 
         private int _size;
-
-        private List<string> _locationPositions;
 
         public ShipModel(int size)
         {
             _size = size;
+            CurrentSquaresSize = _size;
+            LocationPositions = new List<string>();
         }
 
-        public void AddLocation(int startHorizontalPositionIndex, int startVerticalLocationIndex,
-            LocationType locationType, int maxBoardSize)
+        public void AddLocation(string locationId)
         {
-            switch (locationType)
+            LocationPositions.Add(locationId);
+        }
+
+        public void ReduceSquareSize()
+        {
+            if (CurrentSquaresSize > 0)
+                CurrentSquaresSize--;
+        }
+
+        public override string ToString()
+        {
+            var locationIdsStringBuilder = new StringBuilder();
+
+            foreach (var locationId in LocationPositions)
             {
-                case LocationType.HorizontalLeft:
-
-                    if (startHorizontalPositionIndex < _size)
-                    {
-                        startHorizontalPositionIndex = _size;
-                    }
-
-                    break;
-
-                case LocationType.HorizontalRight:
-
-                    if ((startHorizontalPositionIndex + _size) > maxBoardSize)
-                    {
-                        startHorizontalPositionIndex = maxBoardSize - _size;
-                    }
-
-                    break;
-
-                case LocationType.VerticalToTop:
-
-                    if (startVerticalLocationIndex < _size)
-                    {
-                        startVerticalLocationIndex = _size;
-                    }
-
-                    break;
-
-                case LocationType.VerticalToBottom:
-
-                    if ((startVerticalLocationIndex + _size) > maxBoardSize)
-                    {
-                        startVerticalLocationIndex = maxBoardSize - _size;
-                    }
-
-                    break;
+                locationIdsStringBuilder.Append($"{locationId}, ");
             }
 
-            switch (locationType)
+            var condition = $"Remain square to hit: {CurrentSquaresSize}";
+
+            if (CurrentSquaresSize == 0)
             {
-                case LocationType.VerticalToTop:
-                case LocationType.VerticalToBottom:
-
-                    var horizontalIndexName = startHorizontalPositionIndex.GetHorizontalIndexName();
-
-                    for (var verticalIndex = 0; verticalIndex < _size; verticalIndex++)
-                    {
-                        var locationPostionIndex = startVerticalLocationIndex + verticalIndex;
-
-                        _locationPositions.Add($"{horizontalIndexName}{locationPostionIndex}");
-                    }
-                    break;
-
-                case LocationType.HorizontalRight:
-                case LocationType.HorizontalLeft:
-
-                    break;
+                condition = "Ship destroyed";
             }
+
+            return $"{Name} : {condition} -> {locationIdsStringBuilder}";
         }
     }
 }
