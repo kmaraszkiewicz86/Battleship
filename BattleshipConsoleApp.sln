@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipConsoleApp", "BattleshipConsoleApp\BattleshipConsoleApp.csproj", "{291B010F-747F-4AA5-8D5D-86729421931D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipConsoleApp", "01-UI\BattleshipConsoleApp\BattleshipConsoleApp\BattleshipConsoleApp.csproj", "{291B010F-747F-4AA5-8D5D-86729421931D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipShared", "..\..\03-Shared\BattleshipShared\BattleshipShared.csproj", "{C2CDCF27-946A-442A-AD28-7106687FE5A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipShared", "03-Shared\BattleshipShared\BattleshipShared.csproj", "{C2CDCF27-946A-442A-AD28-7106687FE5A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BA8FB57A-9B60-4639-843C-74B6511F3220}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipSharedTests", "..\..\04-Tests\BattleshipSharedTests\BattleshipSharedTests.csproj", "{F7009578-B727-4639-93DF-A25BFAAEC8E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipSharedTests", "04-Tests\BattleshipSharedTests\BattleshipSharedTests.csproj", "{F7009578-B727-4639-93DF-A25BFAAEC8E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
