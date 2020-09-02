@@ -6,8 +6,15 @@ using BattleshipShared.Models;
 
 namespace BattleshipShared.Services.Ship
 {
+    /// <summary>
+    /// Service that create next location identifiers based by provided <see cref="LocationModel"/>
+    /// </summary>
     public class ShipService : IShipService
     {
+        /// <summary>
+        /// Location identifier that was added for previous ship, to prevent situation when 
+        /// multiple ships may have conflicts in board field
+        /// </summary>
         private readonly List<string> _usedLocationsIds;
 
         public ShipService()
@@ -15,56 +22,56 @@ namespace BattleshipShared.Services.Ship
             _usedLocationsIds = new List<string>();
         }
 
-        public bool CheckIfLocationIdWasUsed(LocationModel locationModel)
+        /// <summary>
+        /// Get location data and try to add location ids to ship
+        /// If any location id was used with previous ship then return false
+        /// </summary>
+        /// <param name="locationModel"><see cref="LocationModel"/></param>
+        /// <param name="shipModel"><see cref="ShipModel"/></param>
+        /// <returns></returns>
+        public bool TryToGenerateShipModel(LocationModel locationModel,
+            ref ShipModel shipModel)
         {
-            if (_usedLocationsIds.Count == 0)
-            {
-                return false;
-            }
-
             var horizontalIndexName = locationModel.StartHorizontalPositionIndex.GetHorizontalIndexName();
 
+            foreach (var locationId in GetLocationIdsPositions(locationModel))
+            {
+                shipModel.AddLocation(locationId);
+
+                if (_usedLocationsIds.Any(u => u.ToLower() == locationId.ToLower()))
+                {
+                    shipModel.ClearLocationIds();
+                    return false;
+                }
+                    
+            }
+
+            shipModel.LocationIds.ForEach(locationId => _usedLocationsIds.Add(locationId));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Generate location id for next field information
+        /// </summary>
+        /// <param name="locationModel"><see cref="LocationModel"/></param>
+        /// <returns></returns>
+        private IEnumerable<string> GetLocationIdsPositions(LocationModel locationModel)
+        {
             for (var squareSizeIndex = 0; squareSizeIndex < locationModel.SquareSize; squareSizeIndex++)
             {
                 var locationId = GetNextLocationId(locationModel, squareSizeIndex);
 
-                if (_usedLocationsIds.Any(u => u.ToLower() == locationId.ToLower()))
-                    return true;
+                yield return locationId;
             }
-
-            return false;
         }
 
-        public ShipModel GenerateShipModel(LocationModel locationModel)
-        {
-            var shipModel = new ShipModel(locationModel.SquareSize);
-            
-            switch (locationModel.LocationType)
-            {
-                case LocationType.VerticalToTop:
-                case LocationType.VerticalToBottom:
-
-                    foreach (var locationId in GetLocationIdsForVerticalPosition(locationModel))
-                    {
-                        shipModel.AddLocation(locationId);
-                    }
-                    
-                    break;
-
-                case LocationType.HorizontalToRight:
-                case LocationType.HorizontalToLeft:
-
-                    foreach (var locationId in GetLocationIdsForHorizontalPosition(locationModel))
-                    {
-                        shipModel.AddLocation(locationId);
-                    }
-
-                    break;
-            }
-
-            return shipModel;
-        }
-
+        /// <summary>
+        /// Get data for new location id based on which directtion and how many square ship has
+        /// </summary>
+        /// <param name="locationModel"><see cref="LocationModel"/></param>
+        /// <param name="squareSizeIndex">Current index of field that will get location id</param>
+        /// <returns>returns location id that will be use for location id for current field id</returns>
         private string GetNextLocationId(LocationModel locationModel, int squareSizeIndex)
         {
             var verticalIndex = 0;
@@ -95,31 +102,6 @@ namespace BattleshipShared.Services.Ship
 
             var horizontalIndexName = horizontalIndex.GetHorizontalIndexName();
             return $"{horizontalIndexName}{verticalIndex}";
-        }
-
-        private IEnumerable<string> GetLocationIdsForVerticalPosition(LocationModel locationModel)
-        {
-            for (var squareSizeIndex = 0; squareSizeIndex < locationModel.SquareSize; squareSizeIndex++)
-            {
-                var locationId = GetNextLocationId(locationModel, squareSizeIndex);
-
-                _usedLocationsIds.Add(locationId);
-                yield return locationId;
-            }
-        }
-
-        private IEnumerable<string> GetLocationIdsForHorizontalPosition(LocationModel locationModel)
-        {
-            var verticalIndex = locationModel.StartVerticalLocationIndex;
-
-            for (var squareSizeIndex = 0; squareSizeIndex < locationModel.SquareSize; squareSizeIndex++)
-            {
-                var locationId = GetNextLocationId(locationModel, squareSizeIndex);
-
-                _usedLocationsIds.Add(locationId);
-
-                yield return locationId;
-            }
         }
     }
 }

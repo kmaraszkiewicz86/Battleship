@@ -1,9 +1,9 @@
 ﻿using System;
+using BattleshipShared.Adapters.OutputLogger;
 using BattleshipShared.Services.Board;
 using BattleshipShared.Services.BoardPrinter;
 using BattleshipShared.Services.Ship;
 using BattleshipShared.Services.ShipCollection;
-using BattleshipShared.Stubs.ConsoleImpl;
 
 namespace BattleshipConsoleApp
 {
@@ -11,7 +11,7 @@ namespace BattleshipConsoleApp
     {
         static void Main(string[] args)
         {
-            IConsoleStub consoleStub = new ConsoleStub();
+            IOutputLoggerAdapter outputLoggerAdapter = new OutputLoggerAdapter();
 
             IShipService shipService = new ShipService();
             IShipCollectionService shipCollectionService = new ShipCollectionService(shipService);
@@ -19,14 +19,15 @@ namespace BattleshipConsoleApp
             IBoardService boardService = new BoardService(shipCollectionService);
             boardService.GenerateInitialBoard(new int[] { 2 }, 10);
 
-            IBoardPrinterService boardServicePrinter = new BoardPrinterService(boardService, consoleStub);
+            IBoardPrinterService boardServicePrinter = new BoardPrinterService(
+                boardService, shipCollectionService, outputLoggerAdapter);
 
             while (true)
             {
                 boardServicePrinter.ShowBoard();
                 boardServicePrinter.ShowForm();
 
-                if (boardServicePrinter.IsFinish)
+                if (shipCollectionService.IsFinish)
                 {
                     boardServicePrinter.ShowEndingResult();
                     break;

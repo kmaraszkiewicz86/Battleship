@@ -1,82 +1,115 @@
 ﻿using System;
-using System.Linq;
+using BattleshipShared.Adapters.OutputLogger;
 using BattleshipShared.Enums;
 using BattleshipShared.Extensions;
 using BattleshipShared.Models;
 using BattleshipShared.Services.Board;
-using BattleshipShared.Stubs.ConsoleImpl;
+using BattleshipShared.Services.ShipCollection;
 
 namespace BattleshipShared.Services.BoardPrinter
 {
+    /// <summary>
+    /// Service that print data for user ui
+    /// </summary>
     public class BoardPrinterService : IBoardPrinterService
     {
-        public bool IsFinish => _boardService.RemainingShipModels.Count() == 0;
-
+        /// <summary>
+        /// <see cref="IBoardService"/>
+        /// </summary>
         private IBoardService _boardService;
 
-        private IConsoleStub _consoleStub;
+        /// <summary>
+        /// <see cref="IShipCollectionService"/>
+        /// </summary>
+        private IShipCollectionService _shipCollectionService;
 
-        public BoardPrinterService(IBoardService boardService, IConsoleStub consoleStub)
+        /// <summary>
+        /// <see cref="IOutputLoggerAdapter"/>
+        /// </summary>
+        private IOutputLoggerAdapter _outputLoggerAdapter;
+
+        public BoardPrinterService(IBoardService boardService,
+            IShipCollectionService shipCollectionService, IOutputLoggerAdapter outputLoggerAdapter)
         {
             _boardService = boardService;
-            _consoleStub = consoleStub;
+            _shipCollectionService = shipCollectionService;
+            _outputLoggerAdapter = outputLoggerAdapter;
         }
 
+        /// <summary>
+        /// Generate board information for user
+        /// </summary>
         public void ShowBoard()
         {
             Console.Clear();
 
             PrintShipHeader();
-            PrintBoardHeader();
+            PrintHorizontalIndexesNames();
             PrintBoard();
         }
 
+        /// <summary>
+        /// Generate user form where user may type location id for game
+        /// </summary>
         public void ShowForm()
         {
-            _consoleStub.SetConsoleColors(ConsoleColorsType.Default);
+            _outputLoggerAdapter.SetConsoleColors(ConsoleColorsType.Default);
 
-            _consoleStub.Write("Type location: ");
-            var lineString = _consoleStub.ReadLine();
+            _outputLoggerAdapter.WriteLine("========================================================");
+            _outputLoggerAdapter.Write("Type location: ");
+            var lineString = _outputLoggerAdapter.ReadLine();
 
             if (string.IsNullOrWhiteSpace(lineString))
             {
-                _consoleStub.WriteLine("The location id is required");
+                _outputLoggerAdapter.WriteLine("The location id is required");
                 return;
             }
 
             _boardService.CheckLocationId(lineString.Trim());
         }
 
+        /// <summary>
+        /// Generate ending result after all ship will be destroyed
+        /// </summary>
         public void ShowEndingResult()
         {
-            _consoleStub.WriteLine($"The game finished after {_boardService.NumberOfHits} hits");
+            _outputLoggerAdapter.WriteLine($"The game finished after {_boardService.NumberOfHits} hits");
         }
 
+        /// <summary>
+        /// Print ship that was not destroyed before board for user ui
+        /// </summary>
         private void PrintShipHeader()
         {
-            _consoleStub.WriteLine("Remaining ships: ");
-            foreach (var shipModel in _boardService.RemainingShipModels)
+            _outputLoggerAdapter.WriteLine("Remaining ships: ");
+            foreach (var shipModel in _shipCollectionService.RemainingShips)
             {
-                _consoleStub.WriteLine(shipModel.ToString());
+                _outputLoggerAdapter.WriteLine(shipModel.ToString());
             }
         }
 
-        private void PrintBoardHeader()
+        /// <summary>
+        /// Print horizontal names that was generate above of game board
+        /// </summary>
+        private void PrintHorizontalIndexesNames()
         {
-            _consoleStub.Write("   ");
+            _outputLoggerAdapter.Write("   ");
             for (var horizontalIndex = 0; horizontalIndex < 10; horizontalIndex++)
             {
-                _consoleStub.Write($"{horizontalIndex.GetHorizontalIndexName()} ");
+                _outputLoggerAdapter.Write($"{horizontalIndex.GetHorizontalIndexName()} ");
             }
         }
 
+        /// <summary>
+        /// Print board that show which board fields was hit
+        /// </summary>
         private void PrintBoard()
         {
-            _consoleStub.WriteLine();
+            _outputLoggerAdapter.WriteLine();
 
             for (var verticalIndex = 1; verticalIndex <= 10; verticalIndex++)
             {
-                _consoleStub.SetConsoleColors(ConsoleColorsType.Default);
+                _outputLoggerAdapter.SetConsoleColors(ConsoleColorsType.Default);
 
                 PrintVerticalIndex(verticalIndex);
 
@@ -87,16 +120,22 @@ namespace BattleshipShared.Services.BoardPrinter
 
                     var character = GetBoardFieldCharacter(boardField);
 
-                    _consoleStub.SetConsoleColors(boardField.WasHit);
+                    _outputLoggerAdapter.SetConsoleColors(boardField.WasHit);
 
-                    _consoleStub.Write($"{character} ");
+                    _outputLoggerAdapter.Write($"{character} ");
                 }
 
-                _consoleStub.WriteLine();
+                _outputLoggerAdapter.WriteLine();
             }
         }
 
-        private char GetBoardFieldCharacter(FieldModel boardField)
+        /// <summary>
+        /// Get character for each board fields based by information if user hits that field
+        /// and if on the field was one of ship squares that was hit by user
+        /// </summary>
+        /// <param name="boardField"><see cref="BoardFieldModel"/></param>
+        /// <returns></returns>
+        private char GetBoardFieldCharacter(BoardFieldModel boardField)
         {
             var character = '?';
 
@@ -108,15 +147,20 @@ namespace BattleshipShared.Services.BoardPrinter
             return character;
         }
 
+        /// <summary>
+        /// Print verticaly index is generated
+        /// left of the game board
+        /// </summary>
+        /// <param name="verticalIndex"></param>
         private void PrintVerticalIndex(int verticalIndex)
         {
             if (verticalIndex == 10)
             {
-                _consoleStub.Write($"{verticalIndex} ");
+                _outputLoggerAdapter.Write($"{verticalIndex} ");
             }
             else
             {
-                _consoleStub.Write($"{verticalIndex}  ");
+                _outputLoggerAdapter.Write($"{verticalIndex}  ");
             }
         }
     }
