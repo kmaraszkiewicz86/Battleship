@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BattleshipShared.Adapters.OutputLogger;
 using BattleshipShared.Enums;
 using BattleshipShared.Extensions;
@@ -43,7 +44,7 @@ namespace BattleshipShared.Services.BoardPrinter
         {
             Console.Clear();
 
-            PrintShipHeader();
+            PrintRemainingShipsInformationHeader();
             PrintHorizontalIndexesNames();
             PrintBoard();
         }
@@ -56,7 +57,7 @@ namespace BattleshipShared.Services.BoardPrinter
             _outputLoggerAdapter.SetConsoleColors(ConsoleColorsType.Default);
 
             _outputLoggerAdapter.WriteLine("========================================================");
-            _outputLoggerAdapter.Write("Type location: ");
+            _outputLoggerAdapter.Write("Type location eg. (A1) or (a1): ");
             var lineString = _outputLoggerAdapter.ReadLine();
 
             if (string.IsNullOrWhiteSpace(lineString))
@@ -73,19 +74,35 @@ namespace BattleshipShared.Services.BoardPrinter
         /// </summary>
         public void ShowEndingResult()
         {
+            _outputLoggerAdapter.WriteLine("========================================================");
+            _outputLoggerAdapter.WriteLine("======================GAME IS OFER======================");
+            _outputLoggerAdapter.WriteLine("========================================================");
             _outputLoggerAdapter.WriteLine($"The game finished after {_boardService.NumberOfHits} hits");
+            _outputLoggerAdapter.WriteLine("========================================================");
         }
 
         /// <summary>
         /// Print ship that was not destroyed before board for user ui
         /// </summary>
-        private void PrintShipHeader()
+        private void PrintRemainingShipsInformationHeader()
         {
             _outputLoggerAdapter.WriteLine("Remaining ships: ");
-            foreach (var shipModel in _shipCollectionService.RemainingShips)
+            _outputLoggerAdapter.WriteLine("========================================================");
+
+            if (_shipCollectionService.RemainingShips.Count() == 0)
             {
-                _outputLoggerAdapter.WriteLine(shipModel.ToString());
+                _outputLoggerAdapter.WriteLine("All ships was destroyed");
             }
+            else
+            {
+                foreach (var shipModel in _shipCollectionService.RemainingShips)
+                {
+                    _outputLoggerAdapter.WriteLine(shipModel.ToString());
+                }
+            }
+
+            _outputLoggerAdapter.WriteLine("========================================================");
+            _outputLoggerAdapter.WriteLine();
         }
 
         /// <summary>
@@ -98,6 +115,8 @@ namespace BattleshipShared.Services.BoardPrinter
             {
                 _outputLoggerAdapter.Write($"{horizontalIndex.GetHorizontalIndexName()} ");
             }
+
+            _outputLoggerAdapter.WriteLine();
         }
 
         /// <summary>
@@ -105,8 +124,6 @@ namespace BattleshipShared.Services.BoardPrinter
         /// </summary>
         private void PrintBoard()
         {
-            _outputLoggerAdapter.WriteLine();
-
             for (var verticalIndex = 1; verticalIndex <= 10; verticalIndex++)
             {
                 _outputLoggerAdapter.SetConsoleColors(ConsoleColorsType.Default);

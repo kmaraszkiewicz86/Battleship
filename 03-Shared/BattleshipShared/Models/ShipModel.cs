@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using BattleshipShared.Settings;
 
 namespace BattleshipShared.Models
 {
@@ -26,11 +27,46 @@ namespace BattleshipShared.Models
         /// <summary>
         /// The name of ship that based of length of ship squares
         /// </summary>
-        public string Name
+        private string Name
         {
             get
             {
                 return CurrentSquaresSize == 5 ? "Battleship" : "Destroyer";
+            }
+        }
+
+        /// <summary>
+        /// Get information is ship destroyed or not.
+        /// </summary>
+        private string ShipStatus
+        {
+            get
+            {
+                return CurrentSquaresSize > 0
+                    ? $"Remain square to hit: {CurrentSquaresSize}"
+                    : "Ship destroyed";
+            }
+        }
+
+        /// <summary>
+        /// The debug information contains ship location ids printed for user ui
+        /// when <see cref="AppSettings.DebugMode"/> is set as true
+        /// </summary>
+        private string DebugInforamtion
+        {
+            get
+            {
+                if (!AppSettings.IsDebugMode)
+                    return string.Empty;
+
+                var locationIdsStringBuilder = new StringBuilder();
+
+                foreach (var locationId in LocationIds)
+                {
+                    locationIdsStringBuilder.Append($"{locationId}, ");
+                }
+
+                return $" -> {locationIdsStringBuilder}";
             }
         }
 
@@ -72,21 +108,7 @@ namespace BattleshipShared.Models
         /// <returns></returns>
         public override string ToString()
         {
-            var locationIdsStringBuilder = new StringBuilder();
-
-            foreach (var locationId in LocationIds)
-            {
-                locationIdsStringBuilder.Append($"{locationId}, ");
-            }
-
-            var condition = $"Remain square to hit: {CurrentSquaresSize}";
-
-            if (CurrentSquaresSize == 0)
-            {
-                condition = "Ship destroyed";
-            }
-
-            return $"{Name} : {condition} -> {locationIdsStringBuilder}";
+            return $"{Name} : {ShipStatus} {DebugInforamtion}";
         }
     }
 }
