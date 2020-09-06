@@ -40,18 +40,7 @@ namespace BattleshipShared.Services.Board
         public void GenerateInitialBoard(int[] squareSizes, int boardSize)
         {
             _shipCollectionService.GenerateCollectionOfShips(squareSizes, boardSize);
-
-            for (var verticalIndex = 1; verticalIndex <= boardSize; verticalIndex++)
-            {
-                for (var horizontalIndex = 0; horizontalIndex < boardSize; horizontalIndex++)
-                {
-                    var locationId = $"{horizontalIndex.GetHorizontalIndexName()}{verticalIndex}";
-
-                    var shipModel = _shipCollectionService.GetShipModelByLocationId(locationId);
-
-                    BoardFields.Add(locationId, new BoardFieldModel(shipModel));
-                }
-            }
+            ReferenceShipsToBoard(boardSize);
         }
 
         /// <summary>
@@ -84,6 +73,25 @@ namespace BattleshipShared.Services.Board
             boardField.WasHit = true;
 
             return true;
+        }
+
+        /// <summary>
+        /// Reference generated ships by <see cref="IShipCollectionService"/> and add to game board
+        /// </summary>
+        /// <param name="boardSize">The maximum board size to provide valid locations data for each ship</param>
+        private void ReferenceShipsToBoard(int boardSize)
+        {
+            for (var verticalIndex = 1; verticalIndex <= boardSize; verticalIndex++)
+            {
+                for (var horizontalIndex = 0; horizontalIndex < boardSize; horizontalIndex++)
+                {
+                    var locationId = $"{horizontalIndex.GetHorizontalIndexName()}{verticalIndex}";
+
+                    var shipModel = _shipCollectionService.GetShipModelByLocationId(locationId);
+
+                    BoardFields.Add(locationId, new BoardFieldModel(shipModel));
+                }
+            }
         }
     }
 }
