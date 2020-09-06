@@ -43,7 +43,7 @@ namespace BattleshipShared.Models
             get
             {
                 return CurrentSquaresSize > 0
-                    ? $"Remain square to hit: {CurrentSquaresSize}"
+                    ? $"Remain square to hit is {CurrentSquaresSize}"
                     : "Ship destroyed";
             }
         }
@@ -108,7 +108,7 @@ namespace BattleshipShared.Models
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{Name} : {ShipStatus} {DebugInforamtion}";
+            return $"{Name}: {ShipStatus}{DebugInforamtion}";
         }
     }
 }

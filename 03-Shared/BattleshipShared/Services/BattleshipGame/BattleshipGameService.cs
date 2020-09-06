@@ -1,4 +1,5 @@
 ﻿using System;
+using BattleshipShared.Exceptions;
 using BattleshipShared.Services.Board;
 using BattleshipShared.Services.BoardPrinter;
 using BattleshipShared.Services.ShipCollection;
@@ -50,7 +51,7 @@ namespace BattleshipShared.Services.BattleshipGame
         {
             if (_boardService.BoardFields.Count == 0)
             {
-                throw new Exception("The board service is not initialized...");
+                throw new BadRequestException("The board service is not initialized...");
             }
 
             while (true)
