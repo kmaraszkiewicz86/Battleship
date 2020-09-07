@@ -51,7 +51,7 @@ namespace BattleshipShared.Services.BattleshipGame
         {
             if (_boardService.BoardFields.Count == 0)
             {
-                throw new BadRequestException("The board service is not initialized...");
+                throw new BadRequestException("The game board is not initialized...");
             }
 
             while (true)

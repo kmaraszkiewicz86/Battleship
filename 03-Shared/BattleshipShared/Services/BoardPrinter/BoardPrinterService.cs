@@ -29,6 +29,23 @@ namespace BattleshipShared.Services.BoardPrinter
         /// </summary>
         private IOutputLoggerAdapter _outputLoggerAdapter;
 
+        /// <summary>
+        /// The not checked field mark icon, that print on not checked field by user
+        /// </summary>
+        private const char NotCheckedFieldIcon = '?';
+
+        /// <summary>
+        /// The checked field mark icon that is not reference to any ship
+        /// Is show when user check empty field
+        /// </summary>
+        private const char CheckedAndNotEmptyFieldIcon = 'x';
+
+        /// <summary>
+        /// The checked field mark icon that is reference to ship
+        /// Is show when user check not empty field
+        /// </summary>
+        private const char CheckedAndEmptyFieldIcon = 'o';
+        
         public BoardPrinterService(IBoardService boardService,
             IShipCollectionService shipCollectionService, IOutputLoggerAdapter outputLoggerAdapter)
         {
@@ -135,11 +152,11 @@ namespace BattleshipShared.Services.BoardPrinter
                     var locationId = $"{horizontalIndex.GetHorizontalIndexName()}{verticalIndex}";
                     var boardField = _boardService.BoardFields[locationId];
 
-                    var character = GetBoardFieldCharacter(boardField);
+                    var boardFieldIcon = GetBoardFieldIcon(boardField);
 
                     _outputLoggerAdapter.SetConsoleColors(boardField.WasHit);
 
-                    _outputLoggerAdapter.Write($"{character} ");
+                    _outputLoggerAdapter.Write($"{boardFieldIcon} ");
                 }
 
                 _outputLoggerAdapter.WriteLine();
@@ -152,16 +169,16 @@ namespace BattleshipShared.Services.BoardPrinter
         /// </summary>
         /// <param name="boardField"><see cref="BoardFieldModel"/></param>
         /// <returns></returns>
-        private char GetBoardFieldCharacter(BoardFieldModel boardField)
+        private char GetBoardFieldIcon(BoardFieldModel boardField)
         {
-            var character = '?';
+            var boardFieldIcon = NotCheckedFieldIcon;
 
             if (boardField.WasHit)
             {
-                character = (boardField.IsNotEmpty) ? 'o' : 'x';
+                boardFieldIcon = (boardField.IsNotEmpty) ? CheckedAndEmptyFieldIcon : CheckedAndNotEmptyFieldIcon;
             }
 
-            return character;
+            return boardFieldIcon;
         }
 
         /// <summary>
