@@ -35,6 +35,24 @@ namespace BattleshipShared.Services.ShipCollection
 
         private Random _random;
 
+        /// <summary>
+        /// Get lenght of <see cref="LocationType"/>
+        /// </summary>
+        private int LocationTypeEnumLength => 
+            Enum.GetValues(typeof(LocationType)).Length - 1;
+
+        /// <summary>
+        /// Generate random location type for next ship model
+        /// </summary>
+        private LocationType RandomLocationType
+        {
+            get
+            {
+                var randomPosition = _random.Next(1, LocationTypeEnumLength);
+                return (LocationType)randomPosition;
+            }
+        }
+
         public ShipCollectionService(IShipService shipService)
         {
             ShipModels = new List<ShipModel>();
@@ -50,20 +68,30 @@ namespace BattleshipShared.Services.ShipCollection
         /// <param name="boardSize">The maximum board size to provide valid locations data for each ship</param>
         public void GenerateCollectionOfShips(int[] squareSizes, int boardSize)
         {
-            var locationModel = new LocationModel();
-            locationModel.BoardSize = boardSize;
-
-            var locationTypeLength = Enum.GetValues(typeof(LocationType)).Length - 1;
+            var locationModel = new LocationModel
+            {
+                BoardSize = boardSize
+            };
 
             foreach (var squareSize in squareSizes)
             {
-                var randomPosition = _random.Next(1, locationTypeLength);
-
-                locationModel.LocationType = (LocationType)randomPosition;
+                locationModel.LocationType = RandomLocationType;
                 locationModel.SquareSize = squareSize;
 
-                ShipModels.Add(GenerateShipModel(locationModel));
+                ShipModel shipModel = GenerateShipModel(locationModel);
+                ShipModels.Add(shipModel);
             }
+        }
+
+        /// <summary>
+        /// Get ship by location id
+        /// </summary>
+        /// <param name="locationId">Location id data base on {horizontal index}{vertical index}</param>
+        /// <returns><see cref="ShipModel"/></returns>
+        public ShipModel GetShipModelByLocationId(string locationId)
+        {
+            return ShipModels.FirstOrDefault(
+                s => s.LocationIds.Any(l => l.ToLower() == locationId.ToLower()));
         }
 
         /// <summary>
@@ -169,17 +197,6 @@ namespace BattleshipShared.Services.ShipCollection
             }
 
             return startPostionIndex;
-        }
-
-        /// <summary>
-        /// Get ship by location id
-        /// </summary>
-        /// <param name="locationId">Location id data base on {horizontal index}{vertical index}</param>
-        /// <returns><see cref="ShipModel"/></returns>
-        public ShipModel GetShipModelByLocationId(string locationId)
-        {
-            return ShipModels.FirstOrDefault(
-                s => s.LocationIds.Any(l => l.ToLower() == locationId.ToLower()));
         }
     }
 }
